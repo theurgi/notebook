@@ -1,0 +1,41 @@
+# build output
+dist
+packages/*/packed-*.tgz
+
+# cache
+.cache
+.swc/
+.turbo
+*.tsbuildinfo
+
+# coverage
+.nyc_output
+coverage
+
+# dependencies
+.pnpm-store/
+node_modules
+package-lock.json
+yarn.lock
+
+# environment variables
+*.env
+
+# logs & pids
+*.log
+*.log
+logs
+npm-debug.log*
+pids
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# operating system generated files
+.DS_Store
+Thumbs.db
+
+# runtime data
+*.pid
+*.seed
+pids
