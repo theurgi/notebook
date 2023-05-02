@@ -1,14 +1,17 @@
-name: Publish
+name: CI
 
 on:
-  release:
-    types:
-      - created
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  publish-to-npm:
+  build-and-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -46,25 +49,5 @@ jobs:
       - name: Build packages
         run: pnpm run build
 
-      - name: Setup .npmrc file
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
-      - name: Install changesets CLI
-        run: pnpm add --global @changesets/cli
-
-      - name: Create changeset release
-        run: changeset version
-
-      - name: Commit and push changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "release: apply changeset updates [skip ci]" || true
-          git push
-
-      - name: Publish packages to npm
-        run: pnpm publish -r --access=public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Run tests
+        run: pnpm run test
