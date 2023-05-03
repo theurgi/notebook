@@ -1,9 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -51,3 +48,9 @@ jobs:
 
       - name: Run tests
         run: pnpm run test
+
+      - name: Run lint
+        run: pnpm run lint
+
+      - name: Check formatting
+        run: pnpm run format -- --check
