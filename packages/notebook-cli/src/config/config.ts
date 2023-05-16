@@ -1,4 +1,4 @@
-// packages/cli/src/config/config.ts
+// packages/notebook-cli/src/config/config.ts
 import os from 'node:os'
 import path from 'node:path'
 

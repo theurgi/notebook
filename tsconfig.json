@@ -12,11 +12,8 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"strict": true,
-		"target": "esnext",
-		"paths": {
-			"@common/*": ["./common/*"]
-		}
+		"target": "esnext"
 	},
 	"exclude": ["node_modules"],
-	"include": ["packages/**/*"]
+	"include": ["packages/**/*", "plugins/**/*", "scripts/**/*"]
 }

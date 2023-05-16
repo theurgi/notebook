@@ -1,10 +1,10 @@
-// packages/cli/src/commands/init/index.ts
+// packages/notebook-cli/src/commands/init/index.ts
 import { existsSync, mkdirSync } from 'node:fs'
 
+import { createConfig, NotebookContext } from '@phi.school/notebook-core'
 import { help, heading, paragraph, space, table } from '@theurgi/help'
 import type { Result, Spec } from 'arg'
 
-import { config } from '../../config/config'
 import { Command } from '../../utils/Command'
 
 export class InitCommand extends Command {
@@ -38,7 +38,13 @@ export class InitCommand extends Command {
 			return
 		}
 
-		const notebookPath = config.get('notebookPath') as unknown as string
+		const config = createConfig()
+
+		const context = new NotebookContext(config)
+
+		const notebookPath = context.getConfig()[
+			'notebookPath'
+		] as unknown as string
 
 		if (existsSync(notebookPath)) {
 			console.log(`notebook already exists at ${notebookPath}`)

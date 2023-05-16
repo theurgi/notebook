@@ -1,7 +1,7 @@
 // packages/cli/src/index.ts
 import { exit } from 'node:process'
 
-import { isErrnoException } from '@common/utils/errorUtils'
+import { isErrnoException } from '@phi.school/notebook-utils'
 import arg from 'arg'
 
 import pkg from '../package.json'
