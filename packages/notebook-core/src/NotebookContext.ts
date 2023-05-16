@@ -2,6 +2,7 @@
 import rfdc from 'rfdc'
 
 import type { ConfigValues } from './config'
+import type { Plugin } from './Plugin'
 
 const clone = rfdc()
 
@@ -20,10 +21,16 @@ export type CommandHandler = (
  */
 export class NotebookContext {
 	private config: ConfigValues
+
 	private commandHandlers: {
 		[pluginName: string]: { [commandName: string]: CommandHandler }
 	} = {}
+
 	private safeExposedConfig: Partial<ConfigValues> | null = null
+
+	private hooks: {
+		[hookName in keyof Plugin]?: Array<(...args: unknown[]) => unknown>
+	} = {}
 
 	constructor(config: ConfigValues) {
 		this.config = config
@@ -85,5 +92,40 @@ export class NotebookContext {
 		}
 
 		return handler(this, ...args)
+	}
+
+	/**
+	 * Register a hook function.
+	 * @param hookName The name of the hook.
+	 * @param function_ The hook function.
+	 */
+	registerHook(
+		hookName: keyof Plugin,
+		function_: (...args: unknown[]) => unknown
+	) {
+		if (!this.hooks[hookName]) {
+			this.hooks[hookName] = []
+		}
+
+		this.hooks[hookName]?.push(function_)
+	}
+
+	/**
+	 * Invoke all functions registered for a hook.
+	 * @param hookName The name of the hook.
+	 * @param args The arguments to pass to the hook functions.
+	 * @returns An array of the results of each hook function.
+	 */
+	async invokeHooks(
+		hookName: keyof Plugin,
+		...args: unknown[]
+	): Promise<unknown[]> {
+		const hookFunctions = this.hooks[hookName]
+
+		if (!hookFunctions) {
+			return []
+		}
+
+		return Promise.all(hookFunctions.map((function_) => function_(...args)))
 	}
 }
