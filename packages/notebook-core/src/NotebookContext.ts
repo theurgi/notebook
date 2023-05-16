@@ -2,6 +2,7 @@
 import rfdc from 'rfdc'
 
 import type { ConfigValues } from './config'
+import type { Hook } from './hooks'
 import type { Plugin } from './Plugin'
 
 const clone = rfdc()
@@ -29,7 +30,10 @@ export class NotebookContext {
 	private safeExposedConfig: Partial<ConfigValues> | null = null
 
 	private hooks: {
-		[hookName in keyof Plugin]?: Array<(...args: unknown[]) => unknown>
+		[pluginName: string]: {
+			beforeCommand?: Hook<[string]>
+			afterCommand?: Hook<[string]>
+		}
 	} = {}
 
 	constructor(config: ConfigValues) {
@@ -56,21 +60,22 @@ export class NotebookContext {
 	}
 
 	/**
-	 * Register a command handler.
-	 * @param pluginName The name of the plugin.
-	 * @param commandName The name of the command.
-	 * @param handler The command handler.
+	 * Register a plugin.
+	 * @param plugin The plugin to register.
 	 */
-	registerCommandHandler(
-		pluginName: string,
-		commandName: string,
-		handler: CommandHandler
-	) {
-		if (!this.commandHandlers[pluginName]) {
-			this.commandHandlers[pluginName] = {}
+	async registerPlugin(plugin: Plugin) {
+		// Register command handlers
+		this.commandHandlers[plugin.name] = plugin.commandHandlers
+
+		// Register hooks
+		if (plugin.hooks) {
+			this.hooks[plugin.name] = plugin.hooks
 		}
 
-		this.commandHandlers[pluginName][commandName] = handler
+		// Call the setup function if it exists
+		if (plugin.setup) {
+			await plugin.setup(this)
+		}
 	}
 
 	/**
@@ -95,30 +100,15 @@ export class NotebookContext {
 	}
 
 	/**
-	 * Register a hook function.
-	 * @param hookName The name of the hook.
-	 * @param function_ The hook function.
-	 */
-	registerHook(
-		hookName: keyof Plugin,
-		function_: (...args: unknown[]) => unknown
-	) {
-		if (!this.hooks[hookName]) {
-			this.hooks[hookName] = []
-		}
-
-		this.hooks[hookName]?.push(function_)
-	}
-
-	/**
 	 * Invoke all functions registered for a hook.
 	 * @param hookName The name of the hook.
 	 * @param args The arguments to pass to the hook functions.
 	 * @returns An array of the results of each hook function.
 	 */
 	async invokeHooks(
-		hookName: keyof Plugin,
-		...args: unknown[]
+		hookName: keyof Plugin['hooks'],
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		...args: [any]
 	): Promise<unknown[]> {
 		const hookFunctions = this.hooks[hookName]
 
@@ -126,6 +116,10 @@ export class NotebookContext {
 			return []
 		}
 
-		return Promise.all(hookFunctions.map((function_) => function_(...args)))
+		const hookResults = await Promise.all(
+			Object.values(hookFunctions).map((hook) => hook?.(this, ...args))
+		)
+
+		return hookResults
 	}
 }
