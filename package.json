@@ -2,10 +2,14 @@
 	"private": true,
 	"packageManager": "pnpm@8.3.1",
 	"workspaces": [
-		"packages/*"
+		"packages/*",
+		"plugins/*"
 	],
 	"scripts": {
 		"build": "turbo run build",
+		"create-package": "esno ./scripts/create-package.js",
+		"create-plugin": "esno ./scripts/create-plugin.js",
+		"dev": "turbo run dev --no-deps",
 		"format": "turbo run format",
 		"lint": "turbo run lint",
 		"npm-publish": "pnpm publish  --access=public",
@@ -15,16 +19,17 @@
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.26.1",
-		"@commitlint/cli": "^17.6.1",
-		"@commitlint/config-conventional": "^17.6.1",
-		"@theurgi/eslint-config": "^1.12.0",
-		"@types/node": "^18.16.3",
-		"eslint": "^8.39.0",
+		"@commitlint/cli": "^17.6.3",
+		"@commitlint/config-conventional": "^17.6.3",
+		"@theurgi/eslint-config": "^1.13.0",
+		"@types/node": "^18.16.9",
+		"eslint": "^8.40.0",
+		"esno": "^0.16.3",
 		"husky": "^8.0.3",
 		"lint-staged": "^13.2.2",
 		"prettier": "^2.8.8",
 		"tsup": "^6.7.0",
-		"turbo": "^1.9.3",
+		"turbo": "^1.9.4",
 		"typescript": "^5.0.4",
 		"vitest": "^0.30.1"
 	},

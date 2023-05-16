@@ -1,0 +1,13 @@
+{
+	"name": "@phi.school/notebook-plugin-fzf",
+	"version": "0.0.0",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsup src/index.ts --format esm --dts",
+		"dev": "tsup src/index.ts --format esm --dts --watch"
+	},
+	"dependencies": {
+		"@phi.school/notebook-core": "workspace:*"
+	}
+}

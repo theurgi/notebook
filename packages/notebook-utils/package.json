@@ -1,0 +1,12 @@
+{
+	"name": "@phi.school/notebook-utils",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Internal utility functions for the notebook monorepo.",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsup src/index.ts --format esm --dts",
+		"dev": "tsup src/index.ts --format esm --dts --watch"
+	}
+}
