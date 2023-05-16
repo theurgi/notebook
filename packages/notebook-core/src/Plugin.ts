@@ -27,4 +27,22 @@ export interface Plugin {
 	commandHandlers: {
 		[commandName: string]: CommandHandler
 	}
+	/**
+	 * The beforeCommand hook will be called before each command.
+	 * @param context The notebook context in which the plugin operates.
+	 * @param commandName The name of the command that is about to be executed.
+	 */
+	beforeCommand?: (
+		context: NotebookContext,
+		commandName: string
+	) => Promise<void> | void
+	/**
+	 * The afterCommand hook will be called after each command.
+	 * @param context The notebook context in which the plugin operates.
+	 * @param commandName The name of the command that has just been executed.
+	 */
+	afterCommand?: (
+		context: NotebookContext,
+		commandName: string
+	) => Promise<void> | void
 }
