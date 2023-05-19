@@ -2,6 +2,7 @@
 import rfdc from 'rfdc'
 
 import type { ConfigValues } from './config'
+import type { Plugin, PluginHooks } from './Plugin'
 
 const clone = rfdc()
 
@@ -20,10 +21,16 @@ export type CommandHandler = (
  */
 export class NotebookContext {
 	private config: ConfigValues
+
+	private safeExposedConfig: Partial<ConfigValues> | null = null
+
 	private commandHandlers: {
 		[pluginName: string]: { [commandName: string]: CommandHandler }
 	} = {}
-	private safeExposedConfig: Partial<ConfigValues> | null = null
+
+	private hooks: {
+		[pluginName: string]: PluginHooks
+	} = {}
 
 	constructor(config: ConfigValues) {
 		this.config = config
@@ -49,29 +56,34 @@ export class NotebookContext {
 	}
 
 	/**
-	 * Register a command handler.
-	 * @param pluginName The name of the plugin.
-	 * @param commandName The name of the command.
-	 * @param handler The command handler.
+	 * Register a plugin.
+	 * @param plugin The plugin to register.
 	 */
-	registerCommandHandler(
-		pluginName: string,
-		commandName: string,
-		handler: CommandHandler
-	) {
-		if (!this.commandHandlers[pluginName]) {
-			this.commandHandlers[pluginName] = {}
+	async registerPlugin(plugin: Plugin) {
+		// Register command handlers
+		this.commandHandlers[plugin.name] = plugin.commandHandlers
+
+		// Register hooks
+		if (plugin.hooks) {
+			this.hooks[plugin.name] = plugin.hooks
 		}
 
-		this.commandHandlers[pluginName][commandName] = handler
+		// Call the setup function if it exists
+		if (plugin.setup) {
+			await plugin.setup(this)
+		}
 	}
 
 	/**
-	 * Invoke a command handler.
-	 * @param pluginName The name of the plugin.
-	 * @param commandName The name of the command.
-	 * @param args The arguments to pass to the command handler.
+	 * Invoke a command handler, triggering hooks before and after the command.
+	 *
+	 * @param pluginName - The name of the plugin that provides the command handler.
+	 * @param commandName - The name of the command to be executed.
+	 * @param args - The arguments to pass to the command handler.
+	 *
 	 * @returns The result of the command handler.
+	 *
+	 * @throws {Error} If the command handler does not exist.
 	 */
 	async invokeCommandHandler(
 		pluginName: string,
@@ -81,9 +93,43 @@ export class NotebookContext {
 		const handler = this.commandHandlers[pluginName]?.[commandName]
 
 		if (!handler) {
+			// TODO review error handling
 			throw new Error(`Command "${commandName}" not found.`)
 		}
 
-		return handler(this, ...args)
+		// Invoke 'beforeCommand' hooks
+		await this.invokeHooks('beforeCommand', pluginName, commandName)
+
+		// Execute the command
+		const result = await handler(this, ...args)
+
+		// Invoke 'afterCommand' hooks
+		await this.invokeHooks('afterCommand', pluginName, commandName)
+
+		return result
+	}
+
+	/**
+	 * Invoke all functions registered for a hook.
+	 * @param hookName The name of the hook.
+	 * @param args The arguments to pass to the hook functions.
+	 * @returns An array of the results of each hook function.
+	 */
+	async invokeHooks(
+		hookName: keyof PluginHooks,
+		...args: [string, string]
+	): Promise<unknown[]> {
+		const hookResults = []
+
+		for (const pluginHooks of Object.values(this.hooks)) {
+			const hook = pluginHooks[hookName]
+
+			if (hook) {
+				const result = await hook(this, ...args)
+				hookResults.push(result)
+			}
+		}
+
+		return hookResults
 	}
 }

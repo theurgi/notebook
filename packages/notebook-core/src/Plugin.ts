@@ -1,4 +1,14 @@
+// packages/notebook-core/src/Plugin.ts
+import type { Hook } from './hooks'
 import { NotebookContext, CommandHandler } from './NotebookContext'
+
+/**
+ * The PluginHooks interface represents the hooks a plugin can provide.
+ */
+export interface PluginHooks {
+	beforeCommand?: Hook<[string, string]>
+	afterCommand?: Hook<[string, string]>
+}
 
 /**
  * The Plugin interface represents the base structure for all plugins in the
@@ -9,10 +19,12 @@ export interface Plugin {
 	 * A unique name for the plugin.
 	 */
 	name: string
+
 	/**
 	 * The plugin's version number.
 	 */
 	version: string
+
 	/**
 	 * The setup function is called when the plugin is initialized.
 	 * It is responsible for registering the plugin's command handlers with the
@@ -20,6 +32,7 @@ export interface Plugin {
 	 * @param context The notebook context in which the plugin operates.
 	 */
 	setup: (context: NotebookContext) => Promise<void> | void
+
 	/**
 	 * The commandHandlers object contains the plugin's command handlers.
 	 * Each command handler is a function that can be invoked by other plugins or by the core application.
@@ -27,4 +40,10 @@ export interface Plugin {
 	commandHandlers: {
 		[commandName: string]: CommandHandler
 	}
+
+	/**
+	 * The hooks object contains the plugin's hooks.
+	 * Each hook is a function that can be invoked by the notebook context.
+	 */
+	hooks?: PluginHooks
 }
