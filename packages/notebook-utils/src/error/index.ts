@@ -1,1 +1,0 @@
-export { isErrnoException } from './isErrnoException'
