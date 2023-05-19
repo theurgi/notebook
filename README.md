@@ -10,9 +10,9 @@
 
 - **Seamless Integration**: `notebook` is crafted to integrate seamlessly with the tools you already know and love. Be it vim, emacs, vscode, or a web, mobile, or desktop interface, your data should be accessible where and how you want it.
 
-- **Endless functionality**: `notebook` doesn't assume to know every feature you want or need, but its designed to accommodate them all. From AI integration to technologies yet unknown, `notebook` is designed to evolve gracefully with whatever comes next.
+- **Endless functionality**: `notebook` doesn't assume to know every feature you want or need, but it's designed to accommodate them all. From AI integration to technologies yet unknown, `notebook` is designed to evolve gracefully with whatever comes next.
 
-- **Optimized for Learning**: With `notebook`, the goal is to learn once and never forget. It is designed not just for storing knowledge, but also for organizing, retrieving, and effectively utilizing what you've learned
+- **Optimized for Learning**: With `notebook`, the goal is to learn once and never forget. It is designed not just for storing knowledge, but also for organizing, retrieving, and effectively utilizing what you've learned.
 
 ## Development Status
 
