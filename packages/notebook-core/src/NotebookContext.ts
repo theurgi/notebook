@@ -2,8 +2,7 @@
 import rfdc from 'rfdc'
 
 import type { ConfigValues } from './config'
-import type { Hook } from './hooks'
-import type { Plugin } from './Plugin'
+import type { Plugin, PluginHooks } from './Plugin'
 
 const clone = rfdc()
 
@@ -23,17 +22,14 @@ export type CommandHandler = (
 export class NotebookContext {
 	private config: ConfigValues
 
+	private safeExposedConfig: Partial<ConfigValues> | null = null
+
 	private commandHandlers: {
 		[pluginName: string]: { [commandName: string]: CommandHandler }
 	} = {}
 
-	private safeExposedConfig: Partial<ConfigValues> | null = null
-
 	private hooks: {
-		[pluginName: string]: {
-			beforeCommand?: Hook<[string]>
-			afterCommand?: Hook<[string]>
-		}
+		[pluginName: string]: PluginHooks
 	} = {}
 
 	constructor(config: ConfigValues) {
@@ -79,11 +75,15 @@ export class NotebookContext {
 	}
 
 	/**
-	 * Invoke a command handler.
-	 * @param pluginName The name of the plugin.
-	 * @param commandName The name of the command.
-	 * @param args The arguments to pass to the command handler.
+	 * Invoke a command handler, triggering hooks before and after the command.
+	 *
+	 * @param pluginName - The name of the plugin that provides the command handler.
+	 * @param commandName - The name of the command to be executed.
+	 * @param args - The arguments to pass to the command handler.
+	 *
 	 * @returns The result of the command handler.
+	 *
+	 * @throws {Error} If the command handler does not exist.
 	 */
 	async invokeCommandHandler(
 		pluginName: string,
@@ -93,10 +93,20 @@ export class NotebookContext {
 		const handler = this.commandHandlers[pluginName]?.[commandName]
 
 		if (!handler) {
+			// TODO review error handling
 			throw new Error(`Command "${commandName}" not found.`)
 		}
 
-		return handler(this, ...args)
+		// Invoke 'beforeCommand' hooks
+		await this.invokeHooks('beforeCommand', pluginName, commandName)
+
+		// Execute the command
+		const result = await handler(this, ...args)
+
+		// Invoke 'afterCommand' hooks
+		await this.invokeHooks('afterCommand', pluginName, commandName)
+
+		return result
 	}
 
 	/**
@@ -106,19 +116,19 @@ export class NotebookContext {
 	 * @returns An array of the results of each hook function.
 	 */
 	async invokeHooks(
-		hookName: keyof Plugin['hooks'],
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		...args: [any]
+		hookName: keyof PluginHooks,
+		...args: [string, string]
 	): Promise<unknown[]> {
-		const hookFunctions = this.hooks[hookName]
+		const hookResults = []
 
-		if (!hookFunctions) {
-			return []
+		for (const pluginHooks of Object.values(this.hooks)) {
+			const hook = pluginHooks[hookName]
+
+			if (hook) {
+				const result = await hook(this, ...args)
+				hookResults.push(result)
+			}
 		}
-
-		const hookResults = await Promise.all(
-			Object.values(hookFunctions).map((hook) => hook?.(this, ...args))
-		)
 
 		return hookResults
 	}

@@ -3,6 +3,14 @@ import type { Hook } from './hooks'
 import { NotebookContext, CommandHandler } from './NotebookContext'
 
 /**
+ * The PluginHooks interface represents the hooks a plugin can provide.
+ */
+export interface PluginHooks {
+	beforeCommand?: Hook<[string, string]>
+	afterCommand?: Hook<[string, string]>
+}
+
+/**
  * The Plugin interface represents the base structure for all plugins in the
  * notebook project.
  */
@@ -37,8 +45,5 @@ export interface Plugin {
 	 * The hooks object contains the plugin's hooks.
 	 * Each hook is a function that can be invoked by the notebook context.
 	 */
-	hooks?: {
-		beforeCommand?: Hook<[string]>
-		afterCommand?: Hook<[string]>
-	}
+	hooks?: PluginHooks
 }
