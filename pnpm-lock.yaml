@@ -47,6 +47,12 @@ importers:
         specifier: ^0.30.1
         version: 0.30.1
 
+  packages/notebook-core:
+    dependencies:
+      inversify:
+        specifier: ^6.0.1
+        version: 6.0.1
+
 packages:
 
   /@astrojs/compiler@1.4.1:
@@ -3046,6 +3052,10 @@ packages:
       has: 1.0.3
       side-channel: 1.0.4
     dev: true
+
+  /inversify@6.0.1:
+    resolution: {integrity: sha512-B3ex30927698TJENHR++8FfEaJGqoWOgI6ZY5Ht/nLUsFCwHn6akbwtnUAPCgUepAnTpe2qHxhDNjoKLyz6rgQ==}
+    dev: false
 
   /is-arguments@1.1.1:
     resolution: {integrity: sha512-8Q7EARjzEnKpt/PCD7e1cgUS0a6X8u5tdSiMqXhojOdoV9TsMsiO+9VLC5vAmO8N7/GmXn7yjR8qnA6bVAEzfA==}
