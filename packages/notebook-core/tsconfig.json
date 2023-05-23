@@ -1,0 +1,9 @@
+{
+	"extends": "../../tsconfig.json",
+	"include": ["src/**/*"],
+	"compilerOptions": {
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"types": ["reflect-metadata"]
+	}
+}

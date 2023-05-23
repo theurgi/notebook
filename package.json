@@ -14,7 +14,7 @@
 		"lint": "turbo run lint",
 		"npm-publish": "pnpm publish  --access=public",
 		"prepare": "husky install",
-		"test": "turbo run test",
+		"test": "vitest",
 		"type-check": "turbo run type-check"
 	},
 	"devDependencies": {
