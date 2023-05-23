@@ -6,7 +6,7 @@
 
 - **A Lifelong App**: `notebook` is designed to evolve with you, serving as an ever-improving personal trove of data—a living document for your evolving knowledge landscape.
 
-- **Data Freedom**: "Your data" should be taken literally, meaning "you own it" and "you control it". Your data should never be locked in to a platform, it should be fully portable and you should be in complete control of access permissions.
+- **Data Freedom**: "Your data" should be taken literally, meaning "you own it" and "you control it". Your data should never be locked into a platform, it should be fully portable and you should be in complete control of access permissions.
 
 - **Seamless Integration**: `notebook` is crafted to integrate seamlessly with the tools you already know and love. Be it vim, emacs, vscode, or a web, mobile, or desktop interface, your data should be accessible where and how you want it.
 
